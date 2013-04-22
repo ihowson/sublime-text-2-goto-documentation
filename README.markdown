@@ -2,6 +2,16 @@
 
 A command to jump to documentation for the current word.
 
+## ihowson branch
+
+This branch improves the Python documentation lookup.
+
+I don't like `help()` style docs, so (with configuration) lookups will go to the HTML documentation. If it's not configured or a suitable page can't be found, it'll do a search on doc.python.org.
+
+You should download the Python documentation library ([Python 2](http://docs.python.org/2/download.html) or [Python 3](http://docs.python.org/3/download.html)). Tweak your config to set the path where you've unzipped this:
+
+    "goto_documentation_python_path": "/Users/Ian/Documents/python-2.7.3-docs-html"
+
 ## Supports
 
  * PHP

@@ -94,14 +94,35 @@ class GotoDocumentationCommand(sublime_plugin.TextCommand):
     coffee_doc = js_doc
 
     def python_doc(self, keyword, scope):
-        """Not trying to be full on intellisense here, but want to make opening a
-        browser to a docs.python.org search a last resort
-        """
-        if not re.match(r'\s', keyword):
-            self.run_command(["python", "-m", "pydoc", keyword])
-            return
+        prefs = sublime.load_settings("Preferences.sublime-settings")
+        path = prefs.get("goto_documentation_python_path", None)
 
-        open_url("http://docs.python.org/search.html?q=%s" % keyword)
+        found = None
+        if path is not None:
+            # try to find the keyword on disk
+            soughtname = '%s.html' % keyword
+            searchpath = os.path.join(path, 'library')
+            try:
+                for p in os.listdir(searchpath):
+                    if p == soughtname:
+                        found = "file://%s" % os.path.join(searchpath, soughtname)
+                        break
+            except OSError:
+                sublime.status_message("ERROR: can't find docs path '%s'" % searchpath)
+                return
+
+        if found is None:
+            # no luck, search on doc.python.org
+            found = "http://docs.python.org/search.html?q=%s" % keyword
+
+        open_url(found)
+
+        # TODO: Also need a config option for preferred python version for doc.python.org search
+        # TODO: we could look at 'scope' to take a better guess at where to search
+        # http://www.searchify.com/documentation/python-client
+        # http://blog.codecropper.com/2012/02/pythons-documentation-at-your-fingertips/
+        # http://kapeli.com/dash/
+        # http://www.vim.org/scripts/script.php?script_id=910
 
     def clojure_doc(self, keyword, scope):
         open_url("http://clojuredocs.org/search?x=0&y=0&q=%s" % keyword)
